@@ -1,8 +1,8 @@
 <?php
 $host = 'localhost';
-$db = 'task_manager';  // Change this to match your actual database name
-$user = 'root';  // Change if needed
-$pass = '';  // Add your MySQL password if needed
+$db = 'task_manager';
+$user = 'root';
+$pass = '';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$db", $user, $pass);

@@ -21,11 +21,11 @@ if (isset($_POST['submit'])) {
 }
 ?>
 
-<!-- Adding custom styles to improve visibility in dark mode -->
+
 <style>
     .login-page {
-        background-color: #343a40; /* Dark background for login page */
-        color: #fff; /* White text for better contrast */
+        background-color: #343a40; 
+        color: #fff; 
         min-height: 100vh;
         display: flex;
         align-items: center;
@@ -35,28 +35,28 @@ if (isset($_POST['submit'])) {
         width: 360px;
     }
     .login-card-body {
-        background-color: #1e1e1e; /* Dark background for login form */
+        background-color: #1e1e1e;
         border-radius: 10px;
         padding: 20px;
     }
     .form-control {
-        background-color: #2c2c2c; /* Dark background for input fields */
+        background-color: #2c2c2c; 
         border: 1px solid #555;
         color: #fff;
     }
     .form-control::placeholder {
-        color: #bbb; /* Light placeholder text */
+        color: #bbb; 
     }
     .input-group-text {
-        background-color: #2c2c2c; /* Dark input addon background */
+        background-color: #2c2c2c;
         border: 1px solid #555;
     }
     .btn-primary {
-        background-color: #007bff; /* Button color */
+        background-color: #007bff;
         border-color: #007bff;
     }
     .btn-primary:hover {
-        background-color: #0056b3; /* Darker on hover */
+        background-color: #0056b3;
         border-color: #004085;
     }
 </style>

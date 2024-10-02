@@ -12,7 +12,6 @@ $isAdmin = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin';
 <nav class="mt-2">
     <ul class="nav nav-pills nav-sidebar flex-column">
         <?php if ($isLoggedIn): ?>
-            <!-- Show the full menu if the user is logged in -->
             <li class="nav-item">
                 <a href="index.php" class="nav-link">
                     <i class="nav-icon fas fa-home"></i>
