@@ -22,6 +22,12 @@
                     <a href="index.php" class="nav-link">Home</a>
                 </li>
             </ul>
+            <!-- Session opened by [name] -->
+            <?php if (isset($_SESSION['user_name'])): ?>
+            <div class="navbar-text ml-auto pr-3">
+                Session opened by <?php echo htmlspecialchars($_SESSION['user_name']); ?>
+            </div>
+            <?php endif; ?>
         </nav>
         <!-- Sidebar -->
         <aside class="main-sidebar sidebar-dark-primary elevation-4">

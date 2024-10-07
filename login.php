@@ -12,15 +12,18 @@ if (isset($_POST['submit'])) {
     $user = $stmt->fetch();
 
     if ($user && password_verify($password, $user['mot_de_passe'])) {
+        // Store user information in session
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_role'] = $user['droit'];
+        $_SESSION['user_name'] = $user['nom']; // Storing user's name in session
+
         header('Location: index.php');
+        exit();
     } else {
         echo "<p style='color:red;'>Invalid login credentials!</p>";
     }
 }
 ?>
-
 
 <style>
     .login-page {

@@ -51,11 +51,17 @@ $isAdmin = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin';
                 </a>
             </li>
         <?php else: ?>
-            <!-- Show only the Login button if the user is not logged in -->
+            <!-- Show the Login and Register buttons if the user is not logged in -->
             <li class="nav-item">
                 <a href="login.php" class="nav-link">
                     <i class="nav-icon fas fa-sign-in-alt"></i>
                     <p>Login</p>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="register.php" class="nav-link">
+                    <i class="nav-icon fas fa-user-plus"></i>
+                    <p>Register</p>
                 </a>
             </li>
         <?php endif; ?>

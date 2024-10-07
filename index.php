@@ -3,6 +3,9 @@
 <section class="content">
     <div class="container-fluid">
         <div class="row">
+
+            <!-- Show cards only if the user is logged in -->
+            <?php if (isset($_SESSION['user_id'])): ?>
             <!-- Card for Tasks -->
             <div class="col-lg-3 col-6">
                 <div class="small-box bg-info">
@@ -13,7 +16,9 @@
                     <div class="icon">
                         <i class="fas fa-tasks"></i>
                     </div>
-                    <a href="task.php" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                    <a href="task.php" class="small-box-footer">
+                        More info <i class="fas fa-arrow-circle-right"></i>
+                    </a>
                 </div>
             </div>
 
@@ -27,7 +32,9 @@
                     <div class="icon">
                         <i class="fas fa-flag"></i>
                     </div>
-                    <a href="mission.php" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                    <a href="mission.php" class="small-box-footer">
+                        More info <i class="fas fa-arrow-circle-right"></i>
+                    </a>
                 </div>
             </div>
 
@@ -42,7 +49,9 @@
                     <div class="icon">
                         <i class="fas fa-cogs"></i>
                     </div>
-                    <a href="operation.php" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                    <a href="operation.php" class="small-box-footer">
+                        More info <i class="fas fa-arrow-circle-right"></i>
+                    </a>
                 </div>
             </div>
             <?php endif; ?>
@@ -57,10 +66,12 @@
                     <div class="icon">
                         <i class="fas fa-user"></i>
                     </div>
-                    <a href="profile.php" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                    <a href="user.php" class="small-box-footer">
+                        More info <i class="fas fa-arrow-circle-right"></i>
+                    </a>
                 </div>
             </div>
-
+            <?php endif; ?>
         </div>
     </div>
 </section>
