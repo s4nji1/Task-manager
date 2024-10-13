@@ -31,6 +31,12 @@ $isAdmin = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin';
                 </a>
             </li>
             <li class="nav-item">
+                <a href="LinkTaskToMission.php" class="nav-link">
+                    <i class="nav-icon fas fa-link"></i>
+                    <p>Link task to mission</p>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a href="user.php" class="nav-link">
                     <i class="nav-icon fas fa-user"></i>
                     <p>User Profile</p>
