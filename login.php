@@ -2,25 +2,42 @@
 include('header.php');
 include('condb.php');
 
+
+// Génération du token CSRF s'il n'existe pas
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 if (isset($_POST['submit'])) {
-    $email = $_POST['email'];
+    // Vérification du token CSRF
+    if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        die('Erreur CSRF, opération non autorisée.');
+    }
+
+    // Validation des données entrées par l'utilisateur
+    $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);
     $password = $_POST['password'];
 
-    // Validate user
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
-    $stmt->execute([$email]);
-    $user = $stmt->fetch();
-
-    if ($user && password_verify($password, $user['mot_de_passe'])) {
-        // Store user information in session
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['user_role'] = $user['droit'];
-        $_SESSION['user_name'] = $user['nom']; // Storing user's name in session
-
-        header('Location: index.php');
-        exit();
+    if (!$email) {
+        echo "<p style='color:red;'>Adresse e-mail invalide !</p>";
     } else {
-        echo "<p style='color:red;'>Invalid login credentials!</p>";
+        // Validation de l'utilisateur
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        $user = $stmt->fetch();
+
+        if ($user && password_verify($password, $user['mot_de_passe'])) {
+            // Session sécurisée
+            session_regenerate_id(true); // Prévient la fixation de session
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['user_role'] = $user['droit'];
+            $_SESSION['user_name'] = $user['nom']; // Stockage du nom dans la session
+
+            header('Location: index.php');
+            exit();
+        } else {
+            echo "<p style='color:red;'>Identifiants de connexion incorrects !</p>";
+        }
     }
 }
 ?>
@@ -71,9 +88,11 @@ if (isset($_POST['submit'])) {
         </div>
         <div class="card">
             <div class="card-body login-card-body">
-                <p class="login-box-msg">Sign in to start your session</p>
+                <p class="login-box-msg">Connectez-vous pour commencer votre session</p>
 
                 <form action="" method="post">
+                    <!-- Token CSRF -->
+                    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
                     <div class="input-group mb-3">
                         <input type="email" name="email" class="form-control" placeholder="Email" required>
                         <div class="input-group-append">
@@ -83,7 +102,7 @@ if (isset($_POST['submit'])) {
                         </div>
                     </div>
                     <div class="input-group mb-3">
-                        <input type="password" name="password" class="form-control" placeholder="Password" required>
+                        <input type="password" name="password" class="form-control" placeholder="Mot de passe" required>
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-lock"></span>
@@ -92,7 +111,7 @@ if (isset($_POST['submit'])) {
                     </div>
                     <div class="row">
                         <div class="col-4">
-                            <button type="submit" name="submit" class="btn btn-primary btn-block">Sign In</button>
+                            <button type="submit" name="submit" class="btn btn-primary btn-block">Connexion</button>
                         </div>
                     </div>
                 </form>

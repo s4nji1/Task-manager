@@ -2,23 +2,50 @@
 include('header.php');
 include('condb.php');
 
+// Génération du token CSRF s'il n'existe pas
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 if (isset($_POST['register'])) {
-    $nom = $_POST['nom'];
-    $email = $_POST['email'];
-    $password = password_hash($_POST['password'], PASSWORD_BCRYPT);
+    // Vérification du token CSRF
+    if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        die('Erreur CSRF, opération non autorisée.');
+    }
 
-    $stmt = $pdo->prepare("INSERT INTO users (nom, email, mot_de_passe, droit, etat) VALUES (?, ?, ?, 'user', 'active')");
-    $stmt->execute([$nom, $email, $password]);
+    // Validation des données entrées par l'utilisateur
+    $nom = filter_var($_POST['nom'], FILTER_SANITIZE_STRING);
+    $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);
+    $password = $_POST['password'];
 
-    echo "User registered successfully!";
+    if (!$email) {
+        echo "Adresse e-mail invalide.";
+    } elseif (strlen($password) < 8) {
+        echo "Le mot de passe doit contenir au moins 8 caractères.";
+    } else {
+        // Hash sécurisé du mot de passe
+        $hashed_password = password_hash($password, PASSWORD_BCRYPT);
+
+        try {
+            // Insertion des données dans la base de données
+            $stmt = $pdo->prepare("INSERT INTO users (nom, email, mot_de_passe, droit, etat) VALUES (?, ?, ?, 'user', 'active')");
+            $stmt->execute([$nom, $email, $hashed_password]);
+
+            echo "Utilisateur enregistré avec succès !";
+        } catch (PDOException $e) {
+            // Gestion des erreurs lors de l'insertion
+            echo "Erreur lors de l'enregistrement de l'utilisateur : " . $e->getMessage();
+        }
+    }
 }
 ?>
 
 <div class="content">
     <h2>Register</h2>
     <form method="post">
+        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
         <div class="form-group">
-            <label for="nom">Name</label>
+            <label for="nom">Nom</label>
             <input type="text" name="nom" class="form-control" required>
         </div>
         <div class="form-group">
@@ -26,10 +53,10 @@ if (isset($_POST['register'])) {
             <input type="email" name="email" class="form-control" required>
         </div>
         <div class="form-group">
-            <label for="password">Password</label>
+            <label for="password">Mot de passe</label>
             <input type="password" name="password" class="form-control" required>
         </div>
-        <button type="submit" name="register" class="btn btn-primary">Register</button>
+        <button type="submit" name="register" class="btn btn-primary">S'inscrire</button>
     </form>
 </div>
 
