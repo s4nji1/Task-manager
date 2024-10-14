@@ -19,8 +19,14 @@ if (isset($_POST['update_operation'])) {
     $id = $_POST['id'];
     $operation = $_POST['operation'];
 
+    // Update operation in the database
     $stmt = $pdo->prepare("UPDATE operations SET operation = ? WHERE id = ?");
     $stmt->execute([$operation, $id]);
+
+    // Log the update operation
+    $logOperation = 'Operation updated: ' . $operation;
+    $stmt = $pdo->prepare("INSERT INTO operations (user_id, operation, timestamp) VALUES (?, ?, ?)");
+    $stmt->execute([$_SESSION['user_id'], $logOperation, date('Y-m-d H:i:s')]);
 
     echo "<div class='alert alert-success'>Operation updated successfully!</div>";
 }
@@ -29,26 +35,24 @@ if (isset($_POST['update_operation'])) {
 if (isset($_POST['delete_operation'])) {
     $id = $_POST['id'];
 
+    // Delete operation from the database
     $stmt = $pdo->prepare("DELETE FROM operations WHERE id = ?");
     $stmt->execute([$id]);
+
+    // Log the deletion operation
+    $logOperation = 'Operation deleted: ID ' . $id;
+    $stmt = $pdo->prepare("INSERT INTO operations (user_id, operation, timestamp) VALUES (?, ?, ?)");
+    $stmt->execute([$_SESSION['user_id'], $logOperation, date('Y-m-d H:i:s')]);
 
     echo "<div class='alert alert-success'>Operation deleted successfully!</div>";
 }
 
-// Fetch all operations, tasks, and missions from the database
+// Fetch all operations from the database
 $stmt = $pdo->query("
-    SELECT 'operation' AS type, o.id, o.operation AS description, o.timestamp, u.nom AS user_name
+    SELECT o.id, o.operation AS description, o.timestamp, u.nom AS user_name
     FROM operations o
     JOIN users u ON o.user_id = u.id
-    UNION ALL
-    SELECT 'task' AS type, t.id, t.description, t.created_at AS timestamp, u.nom AS user_name
-    FROM tasks t
-    JOIN users u ON t.user_id = u.id
-    UNION ALL
-    SELECT 'mission' AS type, m.id, m.description, m.created_at AS timestamp, u.nom AS user_name
-    FROM missions m
-    JOIN users u ON m.user_id = u.id
-    ORDER BY timestamp DESC
+    ORDER BY o.timestamp DESC
 ");
 $records = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -62,7 +66,6 @@ $records = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <th>User</th>
                 <th>Description</th>
                 <th>Date/Time</th>
-                <th>Type</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -73,7 +76,6 @@ $records = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <td><?= htmlspecialchars($record['user_name']) ?></td>
                     <td><?= htmlspecialchars($record['description']) ?></td>
                     <td><?= htmlspecialchars($record['timestamp']) ?></td>
-                    <td><?= htmlspecialchars($record['type']) ?></td>
                     <td>
                         <!-- View Button -->
                         <button class="btn btn-info" data-toggle="modal" data-target="#viewModal<?= $record['id'] ?>">View</button>
@@ -101,7 +103,6 @@ $records = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <p><strong>User:</strong> <?= htmlspecialchars($record['user_name']) ?></p>
                                 <p><strong>Description:</strong> <?= htmlspecialchars($record['description']) ?></p>
                                 <p><strong>Date/Time:</strong> <?= htmlspecialchars($record['timestamp']) ?></p>
-                                <p><strong>Type:</strong> <?= htmlspecialchars($record['type']) ?></p>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

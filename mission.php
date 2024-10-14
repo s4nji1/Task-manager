@@ -20,8 +20,14 @@ if (isset($_POST['create_mission'])) {
     $nom = $_POST['nom'];
     $description = $_POST['description'];
 
+    // Insert mission into the database
     $stmt = $pdo->prepare("INSERT INTO missions (nom, description, user_id) VALUES (?, ?, ?)");
     $stmt->execute([$nom, $description, $user_id]);
+
+    // Log operation
+    $operation = 'Mission created: ' . $nom;
+    $stmt = $pdo->prepare("INSERT INTO operations (user_id, operation, timestamp) VALUES (?, ?, ?)");
+    $stmt->execute([$user_id, $operation, date('Y-m-d H:i:s')]);
 
     echo "<div class='alert alert-success'>Mission created successfully!</div>";
 }
@@ -32,8 +38,14 @@ if (isset($_POST['update_mission'])) {
     $nom = $_POST['nom'];
     $description = $_POST['description'];
 
+    // Update mission in the database
     $stmt = $pdo->prepare("UPDATE missions SET nom = ?, description = ? WHERE id = ?");
     $stmt->execute([$nom, $description, $id]);
+
+    // Log operation
+    $operation = 'Mission updated: ' . $nom;
+    $stmt = $pdo->prepare("INSERT INTO operations (user_id, operation, timestamp) VALUES (?, ?, ?)");
+    $stmt->execute([$user_id, $operation, date('Y-m-d H:i:s')]);
 
     echo "<div class='alert alert-success'>Mission updated successfully!</div>";
 }
@@ -42,6 +54,7 @@ if (isset($_POST['update_mission'])) {
 if (isset($_POST['delete_mission'])) {
     $id = $_POST['id'];
 
+    // Check if there are associated tasks
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM tasks WHERE mission_id = ?");
     $stmt->execute([$id]);
     $taskCount = $stmt->fetchColumn();
@@ -49,8 +62,15 @@ if (isset($_POST['delete_mission'])) {
     if ($taskCount > 0) {
         echo "<div class='alert alert-danger'>Cannot delete mission with associated tasks. Please remove the tasks first.</div>";
     } else {
+        // Delete mission from the database
         $stmt = $pdo->prepare("DELETE FROM missions WHERE id = ?");
         $stmt->execute([$id]);
+
+        // Log operation
+        $operation = 'Mission deleted: ' . $id; // Use mission ID or name for clarity
+        $stmt = $pdo->prepare("INSERT INTO operations (user_id, operation, timestamp) VALUES (?, ?, ?)");
+        $stmt->execute([$user_id, $operation, date('Y-m-d H:i:s')]);
+
         echo "<div class='alert alert-success'>Mission deleted successfully!</div>";
     }
 }

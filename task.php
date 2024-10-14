@@ -27,6 +27,11 @@ if (isset($_POST['create_task']) && $mission_id) {
     $stmt = $pdo->prepare("INSERT INTO tasks (nom, description, mission_id, user_id) VALUES (?, ?, ?, ?)");
     $stmt->execute([$task_name, $description, $mission_id, $user_id]);
 
+    // Log operation
+    $operation = 'Task created: ' . $task_name;
+    $stmt = $pdo->prepare("INSERT INTO operations (user_id, operation, timestamp) VALUES (?, ?, ?)");
+    $stmt->execute([$user_id, $operation, date('Y-m-d H:i:s')]);
+
     echo "<div class='alert alert-success'>Task created successfully!</div>";
 }
 
@@ -37,6 +42,11 @@ if (isset($_POST['delete_task'])) {
     // Delete task from the database
     $stmt = $pdo->prepare("DELETE FROM tasks WHERE id = ? AND user_id = ?");
     $stmt->execute([$task_id, $user_id]);
+
+    // Log operation
+    $operation = 'Task deleted: ' . $task_id; // You can include the task name if needed
+    $stmt = $pdo->prepare("INSERT INTO operations (user_id, operation, timestamp) VALUES (?, ?, ?)");
+    $stmt->execute([$user_id, $operation, date('Y-m-d H:i:s')]);
 
     echo "<div class='alert alert-success'>Task deleted successfully!</div>";
 }
@@ -51,9 +61,13 @@ if (isset($_POST['update_task'])) {
     $stmt = $pdo->prepare("UPDATE tasks SET nom = ?, description = ? WHERE id = ? AND user_id = ?");
     $stmt->execute([$task_name, $description, $task_id, $user_id]);
 
+    // Log operation
+    $operation = 'Task updated: ' . $task_name;
+    $stmt = $pdo->prepare("INSERT INTO operations (user_id, operation, timestamp) VALUES (?, ?, ?)");
+    $stmt->execute([$user_id, $operation, date('Y-m-d H:i:s')]);
+
     echo "<div class='alert alert-success'>Task updated successfully!</div>";
 }
-
 
 // Fetch all tasks for the specified mission
 $stmt = $pdo->prepare("SELECT * FROM tasks WHERE mission_id = ?");
