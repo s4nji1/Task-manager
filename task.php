@@ -97,6 +97,7 @@ $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <th>ID</th>
                 <th>Name</th>
                 <th>Description</th>
+                <th>Priority</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -108,12 +109,32 @@ $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <td><?= htmlspecialchars($task['nom']) ?></td>
                         <td><?= htmlspecialchars($task['description']) ?></td>
                         <td>
+                            <?php
+                            $priorityClass = '';
+                            if ($task['priorite'] === 'in progress') {
+                                $priorityClass = 'bg-warning text-dark';
+                            } elseif ($task['priorite'] === 'completed') {
+                                $priorityClass = 'bg-success text-white';
+                            } elseif ($task['priorite'] === 'impossible') {
+                                $priorityClass = 'bg-danger text-white';
+                            } elseif ($task['priorite'] === 'postponed') {
+                                $priorityClass = 'bg-info text-white';
+                            }
+                            ?>
+
+                            <span class="badge <?= $priorityClass; ?>">
+                                <?= ucfirst($task['priorite']); ?>
+                            </span>
+                        </td>
+                        <td>
                             <!-- View Task Button -->
-                            <button class="btn btn-info" data-toggle="modal" data-target="#viewModal<?= $task['id'] ?>">View</button>
-                            
+                            <button class="btn btn-info" data-toggle="modal"
+                                data-target="#viewModal<?= $task['id'] ?>">View</button>
+
                             <!-- Update Task Modal Trigger -->
-                            <button class="btn btn-success" data-toggle="modal" data-target="#updateModal<?= $task['id'] ?>">Update</button>
-                            
+                            <button class="btn btn-success" data-toggle="modal"
+                                data-target="#updateModal<?= $task['id'] ?>">Update</button>
+
                             <!-- Delete Task Form -->
                             <form method="post" style="display:inline;">
                                 <input type="hidden" name="id" value="<?= $task['id'] ?>">
@@ -123,7 +144,8 @@ $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </tr>
 
                     <!-- View Task Modal -->
-                    <div class="modal fade" id="viewModal<?= $task['id'] ?>" tabindex="-1" role="dialog" aria-labelledby="viewModalLabel<?= $task['id'] ?>" aria-hidden="true">
+                    <div class="modal fade" id="viewModal<?= $task['id'] ?>" tabindex="-1" role="dialog"
+                        aria-labelledby="viewModalLabel<?= $task['id'] ?>" aria-hidden="true">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -144,7 +166,8 @@ $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
 
                     <!-- Update Task Modal -->
-                    <div class="modal fade" id="updateModal<?= $task['id'] ?>" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel<?= $task['id'] ?>" aria-hidden="true">
+                    <div class="modal fade" id="updateModal<?= $task['id'] ?>" tabindex="-1" role="dialog"
+                        aria-labelledby="updateModalLabel<?= $task['id'] ?>" aria-hidden="true">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <form method="post">
@@ -158,11 +181,13 @@ $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         <input type="hidden" name="id" value="<?= $task['id'] ?>">
                                         <div class="form-group">
                                             <label for="task_name">Task Name</label>
-                                            <input type="text" name="task_name" class="form-control" value="<?= htmlspecialchars($task['nom']) ?>" required>
+                                            <input type="text" name="task_name" class="form-control"
+                                                value="<?= htmlspecialchars($task['nom']) ?>" required>
                                         </div>
                                         <div class="form-group">
                                             <label for="description">Task Description</label>
-                                            <textarea name="description" class="form-control"><?= htmlspecialchars($task['description']) ?></textarea>
+                                            <textarea name="description"
+                                                class="form-control"><?= htmlspecialchars($task['description']) ?></textarea>
                                         </div>
                                     </div>
                                     <div class="modal-footer">
