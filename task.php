@@ -98,6 +98,7 @@ $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <th>Name</th>
                 <th>Description</th>
                 <th>Priority</th>
+                <th>Status</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -110,20 +111,39 @@ $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <td><?= htmlspecialchars($task['description']) ?></td>
                         <td>
                             <?php
+                            // Define color classes for priority
                             $priorityClass = '';
-                            if ($task['priorite'] === 'in progress') {
-                                $priorityClass = 'bg-warning text-dark';
-                            } elseif ($task['priorite'] === 'completed') {
-                                $priorityClass = 'bg-success text-white';
-                            } elseif ($task['priorite'] === 'impossible') {
-                                $priorityClass = 'bg-danger text-white';
-                            } elseif ($task['priorite'] === 'postponed') {
+                            if ($task['priorite'] === 'Low') {
                                 $priorityClass = 'bg-info text-white';
+                            } elseif ($task['priorite'] === 'Medium') {
+                                $priorityClass = 'bg-warning text-dark';
+                            } elseif ($task['priorite'] === 'High') {
+                                $priorityClass = 'bg-danger text-white';
                             }
                             ?>
 
                             <span class="badge <?= $priorityClass; ?>">
                                 <?= ucfirst($task['priorite']); ?>
+                            </span>
+                        </td>
+
+                        <td>
+                            <?php
+                            // Define color classes for status
+                            $statusClass = '';
+                            if ($task['status'] === 'in progress') {
+                                $statusClass = 'bg-warning text-dark';
+                            } elseif ($task['status'] === 'completed') {
+                                $statusClass = 'bg-success text-white';
+                            } elseif ($task['status'] === 'impossible') {
+                                $statusClass = 'bg-danger text-white';
+                            } elseif ($task['status'] === 'postponed') {
+                                $statusClass = 'bg-secondary text-white';
+                            }
+                            ?>
+
+                            <span class="badge <?= $statusClass; ?>">
+                                <?= ucfirst($task['status']); ?>
                             </span>
                         </td>
                         <td>
