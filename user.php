@@ -27,6 +27,9 @@ $user = $stmt->fetch();
             <td><?= ucfirst($user['droit']); ?></td>
         </tr>
     </table>
+    <div class="col-12 text-center mt-3">
+        <a href="mission.php" class="btn btn-primary mt-5 ">Manage Missions and Tasks</a>
+    </div>
 </div>
 
 <?php include('footer.php'); ?>

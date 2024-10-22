@@ -2,12 +2,10 @@
 include('header.php');
 include('condb.php');
 
-// Ensure session is started and user is logged in
 if (!isset($_SESSION)) {
     session_start();
 }
 
-// Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
     exit();
@@ -15,19 +13,15 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// Get the mission ID from the query parameter
 $mission_id = isset($_GET['mission_id']) ? $_GET['mission_id'] : null;
 
-// Handle task creation
 if (isset($_POST['create_task']) && $mission_id) {
     $task_name = $_POST['task_name'];
     $description = $_POST['description'];
 
-    // Insert new task
     $stmt = $pdo->prepare("INSERT INTO tasks (nom, description, mission_id, user_id) VALUES (?, ?, ?, ?)");
     $stmt->execute([$task_name, $description, $mission_id, $user_id]);
 
-    // Log operation
     $operation = 'Task created: ' . $task_name;
     $stmt = $pdo->prepare("INSERT INTO operations (user_id, operation, timestamp) VALUES (?, ?, ?)");
     $stmt->execute([$user_id, $operation, date('Y-m-d H:i:s')]);
@@ -35,15 +29,12 @@ if (isset($_POST['create_task']) && $mission_id) {
     echo "<div class='alert alert-success'>Task created successfully!</div>";
 }
 
-// Handle task deletion
 if (isset($_POST['delete_task'])) {
     $task_id = $_POST['id'];
 
-    // Delete task from the database
     $stmt = $pdo->prepare("DELETE FROM tasks WHERE id = ? AND user_id = ?");
     $stmt->execute([$task_id, $user_id]);
 
-    // Log operation
     $operation = 'Task deleted: ' . $task_id; // You can include the task name if needed
     $stmt = $pdo->prepare("INSERT INTO operations (user_id, operation, timestamp) VALUES (?, ?, ?)");
     $stmt->execute([$user_id, $operation, date('Y-m-d H:i:s')]);
@@ -51,17 +42,14 @@ if (isset($_POST['delete_task'])) {
     echo "<div class='alert alert-success'>Task deleted successfully!</div>";
 }
 
-// Handle task update
 if (isset($_POST['update_task'])) {
     $task_id = $_POST['id'];
     $task_name = $_POST['task_name'];
     $description = $_POST['description'];
 
-    // Update task in the database
     $stmt = $pdo->prepare("UPDATE tasks SET nom = ?, description = ? WHERE id = ? AND user_id = ?");
     $stmt->execute([$task_name, $description, $task_id, $user_id]);
 
-    // Log operation
     $operation = 'Task updated: ' . $task_name;
     $stmt = $pdo->prepare("INSERT INTO operations (user_id, operation, timestamp) VALUES (?, ?, ?)");
     $stmt->execute([$user_id, $operation, date('Y-m-d H:i:s')]);
@@ -69,7 +57,6 @@ if (isset($_POST['update_task'])) {
     echo "<div class='alert alert-success'>Task updated successfully!</div>";
 }
 
-// Fetch all tasks for the specified mission
 $stmt = $pdo->prepare("SELECT * FROM tasks WHERE mission_id = ?");
 $stmt->execute([$mission_id]);
 $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -111,7 +98,6 @@ $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <td><?= htmlspecialchars($task['description']) ?></td>
                         <td>
                             <?php
-                            // Define color classes for priority
                             $priorityClass = '';
                             if ($task['priorite'] === 'Low') {
                                 $priorityClass = 'bg-info text-white';
@@ -129,7 +115,6 @@ $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                         <td>
                             <?php
-                            // Define color classes for status
                             $statusClass = '';
                             if ($task['status'] === 'in progress') {
                                 $statusClass = 'bg-warning text-dark';
@@ -147,15 +132,15 @@ $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             </span>
                         </td>
                         <td>
-                            <!-- View Task Button -->
+                            
                             <button class="btn btn-info" data-toggle="modal"
                                 data-target="#viewModal<?= $task['id'] ?>">View</button>
 
-                            <!-- Update Task Modal Trigger -->
+                            
                             <button class="btn btn-success" data-toggle="modal"
                                 data-target="#updateModal<?= $task['id'] ?>">Update</button>
 
-                            <!-- Delete Task Form -->
+                            
                             <form method="post" style="display:inline;">
                                 <input type="hidden" name="id" value="<?= $task['id'] ?>">
                                 <button type="submit" name="delete_task" class="btn btn-danger">Delete</button>
@@ -163,7 +148,7 @@ $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         </td>
                     </tr>
 
-                    <!-- View Task Modal -->
+                    
                     <div class="modal fade" id="viewModal<?= $task['id'] ?>" tabindex="-1" role="dialog"
                         aria-labelledby="viewModalLabel<?= $task['id'] ?>" aria-hidden="true">
                         <div class="modal-dialog" role="document">
@@ -185,7 +170,7 @@ $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                     </div>
 
-                    <!-- Update Task Modal -->
+                    
                     <div class="modal fade" id="updateModal<?= $task['id'] ?>" tabindex="-1" role="dialog"
                         aria-labelledby="updateModalLabel<?= $task['id'] ?>" aria-hidden="true">
                         <div class="modal-dialog" role="document">

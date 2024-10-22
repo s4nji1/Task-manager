@@ -1,10 +1,9 @@
 <?php
-// Ensure session is started
+
 if (!isset($_SESSION)) {
     session_start();
 }
 
-// Check if the user is logged in
 $isLoggedIn = isset($_SESSION['user_id']);
 $isAdmin = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin';
 ?>
@@ -57,7 +56,6 @@ $isAdmin = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin';
                 </a>
             </li>
         <?php else: ?>
-            <!-- Show the Login and Register buttons if the user is not logged in -->
             <li class="nav-item">
                 <a href="login.php" class="nav-link">
                     <i class="nav-icon fas fa-sign-in-alt"></i>

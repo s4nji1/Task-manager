@@ -3,35 +3,33 @@ include('header.php');
 include('condb.php');
 
 
-// Génération du token CSRF s'il n'existe pas
+    // CSRF
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
 if (isset($_POST['submit'])) {
-    // Vérification du token CSRF
     if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
         die('Erreur CSRF, opération non autorisée.');
     }
 
-    // Validation des données entrées par l'utilisateur
+    // XSS
     $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);
     $password = $_POST['password'];
 
     if (!$email) {
         echo "<p style='color:red;'>Adresse e-mail invalide !</p>";
     } else {
-        // Validation de l'utilisateur
         $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
         $stmt->execute([$email]);
         $user = $stmt->fetch();
 
         if ($user && password_verify($password, $user['mot_de_passe'])) {
-            // Session sécurisée
-            session_regenerate_id(true); // Prévient la fixation de session
+            // fixation de sessions
+            session_regenerate_id(true);
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_role'] = $user['droit'];
-            $_SESSION['user_name'] = $user['nom']; // Stockage du nom dans la session
+            $_SESSION['user_name'] = $user['nom'];
 
             header('Location: index.php');
             exit();
@@ -91,7 +89,6 @@ if (isset($_POST['submit'])) {
                 <p class="login-box-msg">Connectez-vous pour commencer votre session</p>
 
                 <form action="" method="post">
-                    <!-- Token CSRF -->
                     <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
                     <div class="input-group mb-3">
                         <input type="email" name="email" class="form-control" placeholder="Email" required>

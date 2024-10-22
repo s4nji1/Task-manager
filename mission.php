@@ -2,29 +2,24 @@
 include('header.php');
 include('condb.php');
 
-// Ensure session is started and user is logged in
 if (!isset($_SESSION)) {
     session_start();
 }
 
-// Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
     exit();
 }
 
 $user_id = $_SESSION['user_id'];
-
-// Handle mission creation
+// Create
 if (isset($_POST['create_mission'])) {
     $nom = $_POST['nom'];
     $description = $_POST['description'];
 
-    // Insert mission into the database
     $stmt = $pdo->prepare("INSERT INTO missions (nom, description, user_id) VALUES (?, ?, ?)");
     $stmt->execute([$nom, $description, $user_id]);
 
-    // Log operation
     $operation = 'Mission created: ' . $nom;
     $stmt = $pdo->prepare("INSERT INTO operations (user_id, operation, timestamp) VALUES (?, ?, ?)");
     $stmt->execute([$user_id, $operation, date('Y-m-d H:i:s')]);
@@ -32,17 +27,15 @@ if (isset($_POST['create_mission'])) {
     echo "<div class='alert alert-success'>Mission created successfully!</div>";
 }
 
-// Handle mission updates
+// Update
 if (isset($_POST['update_mission'])) {
     $id = $_POST['id'];
     $nom = $_POST['nom'];
     $description = $_POST['description'];
 
-    // Update mission in the database
     $stmt = $pdo->prepare("UPDATE missions SET nom = ?, description = ? WHERE id = ?");
     $stmt->execute([$nom, $description, $id]);
 
-    // Log operation
     $operation = 'Mission updated: ' . $nom;
     $stmt = $pdo->prepare("INSERT INTO operations (user_id, operation, timestamp) VALUES (?, ?, ?)");
     $stmt->execute([$user_id, $operation, date('Y-m-d H:i:s')]);
@@ -50,11 +43,10 @@ if (isset($_POST['update_mission'])) {
     echo "<div class='alert alert-success'>Mission updated successfully!</div>";
 }
 
-// Handle mission deletion
+// Delete
 if (isset($_POST['delete_mission'])) {
     $id = $_POST['id'];
 
-    // Check if there are associated tasks
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM tasks WHERE mission_id = ?");
     $stmt->execute([$id]);
     $taskCount = $stmt->fetchColumn();
@@ -62,11 +54,9 @@ if (isset($_POST['delete_mission'])) {
     if ($taskCount > 0) {
         echo "<div class='alert alert-danger'>Cannot delete mission with associated tasks. Please remove the tasks first.</div>";
     } else {
-        // Delete mission from the database
         $stmt = $pdo->prepare("DELETE FROM missions WHERE id = ?");
         $stmt->execute([$id]);
 
-        // Log operation
         $operation = 'Mission deleted: ' . $id; // Use mission ID or name for clarity
         $stmt = $pdo->prepare("INSERT INTO operations (user_id, operation, timestamp) VALUES (?, ?, ?)");
         $stmt->execute([$user_id, $operation, date('Y-m-d H:i:s')]);
@@ -75,7 +65,6 @@ if (isset($_POST['delete_mission'])) {
     }
 }
 
-// Fetch all missions of the logged-in user
 $stmt = $pdo->prepare("SELECT * FROM missions WHERE user_id = ?");
 $stmt->execute([$user_id]);
 $missions = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -124,7 +113,7 @@ $missions = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <a href="task.php?mission_id=<?= $mission['id'] ?>" class="btn btn-warning">Manage Tasks</a>
                     </td>
                 </tr>
-                <!-- View Modal -->
+                
                 <div class="modal fade" id="viewModal<?= $mission['id'] ?>" tabindex="-1" role="dialog"
                     aria-labelledby="viewModalLabel<?= $mission['id'] ?>" aria-hidden="true">
                     <div class="modal-dialog" role="document">
@@ -139,9 +128,7 @@ $missions = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <p><strong>Mission Name:</strong> <?= htmlspecialchars($mission['nom']) ?></p>
                                 <p><strong>Description:</strong> <?= htmlspecialchars($mission['description']) ?></p>
                                 <p><strong>Created By:</strong> <?= htmlspecialchars($user_id) ?></p>
-                                <!-- Adjust if you have a username or name field -->
                                 <p><strong>Date Created:</strong> <?= htmlspecialchars($mission['created_at']) ?></p>
-                                <!-- Adjust if you have a date field -->
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -150,7 +137,7 @@ $missions = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                 </div>
 
-                <!-- Update Modal -->
+
                 <div class="modal fade" id="updateModal<?= $mission['id'] ?>" tabindex="-1" role="dialog"
                     aria-labelledby="updateModalLabel<?= $mission['id'] ?>" aria-hidden="true">
                     <div class="modal-dialog" role="document">
@@ -182,7 +169,7 @@ $missions = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                     </div>
                 </div>
-                <!-- Delete Confirmation Modal -->
+
                 <div class="modal fade" id="deleteModal<?= $mission['id'] ?>" tabindex="-1" role="dialog"
                     aria-labelledby="deleteModalLabel<?= $mission['id'] ?>" aria-hidden="true">
                     <div class="modal-dialog" role="document">

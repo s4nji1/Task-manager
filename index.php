@@ -4,7 +4,7 @@
     <div class="container-fluid">
         <div class="row">
 
-            <!-- Show cards only if the user is logged in -->
+            
             <?php if (isset($_SESSION['user_id'])): ?>
             <!-- Card for Tasks -->
             <div class="col-lg-3 col-6">
