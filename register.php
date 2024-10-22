@@ -2,6 +2,7 @@
 include('header.php');
 include('condb.php');
 
+// CSRF 
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
@@ -11,6 +12,7 @@ if (isset($_POST['register'])) {
         die('Erreur CSRF, opération non autorisée.');
     }
 
+    // XSS
     $nom = filter_var($_POST['nom'], FILTER_SANITIZE_STRING);
     $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);
     $password = $_POST['password'];
@@ -20,6 +22,7 @@ if (isset($_POST['register'])) {
     } elseif (strlen($password) < 8) {
         echo "Le mot de passe doit contenir au moins 8 caractères.";
     } else {
+        // password hash
         $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 
         try {
