@@ -19,13 +19,13 @@ $isAdmin = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin';
             </li>
             <li class="nav-item">
                 <a href="mission.php" class="nav-link">
-                    <i class="nav-icon fas fa-tasks"></i>
+                    <i class="nav-icon fas fa-flag"></i>
                     <p>Missions</p>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="task.php" class="nav-link">
-                    <i class="nav-icon fas fa-list"></i>
+                    <i class="nav-icon fas fa-tasks"></i>
                     <p>Tasks</p>
                 </a>
             </li>
