@@ -2,18 +2,42 @@
 include('header.php');
 include('condb.php');
 
-
-    // CSRF
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+// CSRF
+function GenerateCsrfToken(){
+    return bin2hex(random_bytes(32));
 }
 
-if (isset($_POST['submit'])) {
-    if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
-        die('Erreur CSRF, opération non autorisée.');
+$token = GenerateCsrfToken();
+$_SESSION['csrf_token'] = $token;
+StoreCsrfToken($pdo, $token);
+
+function StoreCsrfToken($pdo, $token){
+    $stmt = $pdo->prepare("INSERT INTO csrf_tokens (token) VALUES (?)");
+    $stmt->execute([$token]);
+}
+
+function VerifyCsrfToken($pdo, $token){
+    $stmt = $pdo->prepare("SELECT * FROM csrf_tokens WHERE token = ?");
+    $stmt->execute([$token]);
+    $csrfTokenRecord = $stmt->fetch();
+
+    if($csrfTokenRecord){
+        $stmt = $pdo->prepare("DELETE FROM csrf_tokens WHERE id = ?");
+        $stmt->execute([$csrfTokenRecord['id']]);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+// CSRF Token Verification
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $token = $_POST['csrf_token'];
+    if(!VerifyCsrfToken($pdo, $token)){
+        echo "Erreur : Token csrf invalide";
     }
 
-    // XSS
+    // XSS Protection
     $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);
     $password = $_POST['password'];
 
@@ -25,7 +49,6 @@ if (isset($_POST['submit'])) {
         $user = $stmt->fetch();
 
         if ($user && password_verify($password, $user['mot_de_passe'])) {
-            // fixation de sessions
             session_regenerate_id(true);
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_role'] = $user['droit'];
@@ -39,7 +62,6 @@ if (isset($_POST['submit'])) {
     }
 }
 ?>
-
 <style>
     .login-page {
         background-color: #343a40; 

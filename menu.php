@@ -36,6 +36,13 @@ $isAdmin = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin';
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link" href="shareMission.php">
+                    <i class="nav-icon fas fa-share"></i>
+                    <p>Share Mission</p>
+                </a>
+            </li>
+
+            <li class="nav-item">
                 <a href="user.php" class="nav-link">
                     <i class="nav-icon fas fa-user"></i>
                     <p>User Profile</p>

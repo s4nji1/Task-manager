@@ -2,17 +2,42 @@
 include('header.php');
 include('condb.php');
 
-// CSRF 
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+// CSRF Token Generation and Storage
+function GenerateCsrfToken() {
+    return bin2hex(random_bytes(32));
 }
 
-if (isset($_POST['register'])) {
-    if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
-        die('Erreur CSRF, opération non autorisée.');
+$token = GenerateCsrfToken();
+$_SESSION['csrf_token'] = $token;
+StoreCsrfToken($pdo, $token);
+
+function StoreCsrfToken($pdo, $token) {
+    $stmt = $pdo->prepare("INSERT INTO csrf_tokens (token) VALUES (?)");
+    $stmt->execute([$token]);
+}
+
+function VerifyCsrfToken($pdo, $token) {
+    $stmt = $pdo->prepare("SELECT * FROM csrf_tokens WHERE token = ?");
+    $stmt->execute([$token]);
+    $csrfTokenRecord = $stmt->fetch();
+
+    if ($csrfTokenRecord) {
+        $stmt = $pdo->prepare("DELETE FROM csrf_tokens WHERE id = ?");
+        $stmt->execute([$csrfTokenRecord['id']]);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+// Handle Registration Form Submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
+    $token = $_POST['csrf_token'];
+    if (!VerifyCsrfToken($pdo, $token)) {
+        die("Erreur CSRF : Token CSRF invalide");
     }
 
-    // XSS
+    // Input Validation (XSS Protection)
     $nom = filter_var($_POST['nom'], FILTER_SANITIZE_STRING);
     $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);
     $password = $_POST['password'];
@@ -22,7 +47,7 @@ if (isset($_POST['register'])) {
     } elseif (strlen($password) < 8) {
         echo "Le mot de passe doit contenir au moins 8 caractères.";
     } else {
-        // password hash
+        // Password Hashing
         $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 
         try {
