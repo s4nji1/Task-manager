@@ -34,7 +34,7 @@ function VerifyCsrfToken($pdo, $token){
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = $_POST['csrf_token'];
     if(!VerifyCsrfToken($pdo, $token)){
-        echo "Erreur : Token csrf invalide";
+        die("Erreur CSRF : Token CSRF invalide");
     }
 
     // XSS Protection
