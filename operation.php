@@ -11,32 +11,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
     exit();
 }
 
-if (isset($_POST['update_operation'])) {
-    $id = $_POST['id'];
-    $operation = $_POST['operation'];
-
-    $stmt = $pdo->prepare("UPDATE operations SET operation = ? WHERE id = ?");
-    $stmt->execute([$operation, $id]);
-
-    $logOperation = 'Operation updated: ' . $operation;
-    $stmt = $pdo->prepare("INSERT INTO operations (user_id, operation, timestamp) VALUES (?, ?, ?)");
-    $stmt->execute([$_SESSION['user_id'], $logOperation, date('Y-m-d H:i:s')]);
-
-    echo "<div class='alert alert-success'>Operation updated successfully!</div>";
-}
-
-if (isset($_POST['delete_operation'])) {
-    $id = $_POST['id'];
-
-    $stmt = $pdo->prepare("DELETE FROM operations WHERE id = ?");
-    $stmt->execute([$id]);
-
-    $logOperation = 'Operation deleted: ID ' . $id;
-    $stmt = $pdo->prepare("INSERT INTO operations (user_id, operation, timestamp) VALUES (?, ?, ?)");
-    $stmt->execute([$_SESSION['user_id'], $logOperation, date('Y-m-d H:i:s')]);
-
-    echo "<div class='alert alert-success'>Operation deleted successfully!</div>";
-}
 
 $stmt = $pdo->query("
     SELECT o.id, o.operation AS description, o.timestamp, u.nom AS user_name
