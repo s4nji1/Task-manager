@@ -68,11 +68,6 @@ $records = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <td><?= htmlspecialchars($record['timestamp']) ?></td>
                     <td>
                         <button class="btn btn-info" data-toggle="modal" data-target="#viewModal<?= $record['id'] ?>">View</button>
-                        <form method="post" style="display:inline;">
-                            <input type="hidden" name="id" value="<?= $record['id'] ?>">
-                            <button type="submit" name="delete_operation" class="btn btn-danger">Delete</button>
-                        </form>
-                    </td>
                 </tr>
 
                 <div class="modal fade" id="viewModal<?= $record['id'] ?>" tabindex="-1" role="dialog" aria-labelledby="viewModalLabel<?= $record['id'] ?>" aria-hidden="true">
